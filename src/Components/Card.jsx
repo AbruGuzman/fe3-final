@@ -4,16 +4,51 @@ import React from "react";
 const Card = ({ name, username, id }) => {
 
   const addFav = ()=>{
-    // Aqui iria la logica para agregar la Card en el localStorage
+    const favoritos = localStorage.getItem("favoritos");
+    if (favoritos) {
+      let listaParseada = JSON.parse(favoritos);
+      const listaFiltrada = listaParseada.filter(item => item.id !== id);
+      const existe = listaFiltrada.length !== listaParseada.length;
+      existe ? listaParseada = listaFiltrada : listaParseada.push({name: name, username: username, id: id});
+      localStorage.setItem("favoritos", JSON.stringify(listaParseada));
+      dispatch({
+        type: "FAVS",
+        payload: {
+          ...state,
+          favs: listaParseada
+        }
+      })
+    } else {
+      localStorage.setItem("favoritos", JSON.stringify([{name: name, username: username, id: id}]))
+      dispatch({
+        type: "FAVS",
+        payload: {
+          ...state,
+          favs: [{name: name, username: username, id: id}]
+        }
+      })
+    }
+    setFavorito(!favorito)
+    setUpdate(!update)
   }
+
+  useEffect(() => {
+    const favoritos = localStorage.getItem("favoritos");
+    if (favoritos) {
+      const lista = JSON.parse(favoritos)
+      const cardEncontrada = lista.find(item => item.id === id);
+      if (cardEncontrada) {
+        setFavorito(true)
+      }
+    }
+  }, [update])
+  
 
   return (
     <div className="card">
-        {/* En cada card deberan mostrar en name - username y el id */}
-
-        {/* No debes olvidar que la Card a su vez servira como Link hacia la pagina de detalle */}
-
-        {/* Ademas deberan integrar la logica para guardar cada Card en el localStorage */}
+       <h2>{name}</h2>
+       <h3>{username}</h3>
+       <h4>{id}</h4>
         <button onClick={addFav} className="favButton">Add fav</button>
     </div>
   );
